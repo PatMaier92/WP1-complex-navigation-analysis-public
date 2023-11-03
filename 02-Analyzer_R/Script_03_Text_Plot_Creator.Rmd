@@ -1,0 +1,382 @@
+---
+title: "Text and Plot Creator"
+author: "Patrizia Maier"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  bookdown::word_document2:
+    fig_caption: yes
+    global_numbering: TRUE
+    number_sections: TRUE
+---
+
+```{r setup, include=F, cache=F}
+knitr::read_chunk('Script_02_Analyzer.R')
+knitr::opts_chunk$set(warning=F, message=F) 
+options(knitr.kable.NA='')
+```
+
+```{r, load_analysis_packages, include=F, cache=F}
+```
+
+```{r, include=F}
+
+in_file <- "../WP1_data/WP1_results/wp1_navigation_data.RData"
+load(in_file)
+rm(in_file)
+
+original_data <- data
+data <- data %>% 
+  filter(exclude_trial_matlab==0, exclude_low_performer==F) %>% 
+  mutate(version=factor(if_else(id %% 2 == 0, "A", "B")))
+
+in_file <- "../WP1_data/WP1_results/WP1_questionnaire_data.RData"
+load(in_file)
+rm(in_file)
+```
+
+```{r, data_prep, include=F}
+```
+
+```{r, plot_settings, include=F}
+```
+
+```{r, analysis_settings, include=F}
+```
+
+```{r, papaja_output_helper, include=F}
+```
+
+## Variables of interest
+
+*Memory accuracy*
+
+* **Memory score** 
+
+$$\text{Memory Error [%]} = \sqrt{(x_{reference}-x_{remembered})^2 + (y_{reference}-y_{remembered})^2}$$ 
+
+$$\text{Memory score / Strategy Score [%]} = 1 - (\text{proportion of random error scores < memory error})$$
+
+*Navigation behavior*
+
+* **Latency**
+$$\text{Latency [s]} = t_{n}-t_{1}$$   
+
+* **Excess path length** 
+$$\text{(Ideal) Path Length [vu]} = \sum_{i=1}^{n} \sqrt{(x_{i}-x_{i+1})^2 + (y_{i}-y_{i+1})^2}$$
+
+$$\text{Excess Path Length [vu]} = (\text{path length}-\text{path length}_{ideal})$$
+
+* **Trajectory distance as a marker of egocentric/response navigation** 
+
+$$\text{Trajectory Distance [vu]} = \sum_{k=1}^{K} (originalXY_{k,m}-XY_{k,n}) * (originalXY_{k,m}-XY_{k,n})$$
+
+$$\text{Normalized Trajectory Distance [vu]} = \sqrt{\frac{DTW}{max(m,n)}}$$
+
+* **Initial rotation velocity as marker of allocentric/place navigation**
+
+$$\text{Initial Rotation Velocity [rad/s]} = \frac{\sum_{i=1}^{n_{initial}} | (z_{i}-z_{i+1})|} {t_{initial}}$$
+
+\newpage
+
+# Results 
+
+## Learning Session
+
+### Memory score
+
+```{r, base_memory_score, include=F}
+```
+
+```{r, base_memory_score_ego, include=F}
+```
+
+```{r, base_memory_score_allo, include=F}
+```
+
+```{r apa_base_memory_score, include=F}
+apa_lmm.base_ms <- apa_print(model.base_ms)
+
+mean_1H.base_ms <- printnum(model.base_ms$data$memory_score[model.base_ms$data$group=="Delay1H"] %>% mean(na.rm=T) %>% round(2))
+sd_1H.base_ms <- printnum(model.base_ms$data$memory_score[model.base_ms$data$group=="Delay1H"] %>% sd(na.rm=T) %>% round(2))
+mean_1D.base_ms <- printnum(model.base_ms$data$memory_score[model.base_ms$data$group=="Delay1D"] %>% mean(na.rm=T) %>% round(2))
+sd_1D.base_ms <- printnum(model.base_ms$data$memory_score[model.base_ms$data$group=="Delay1D"] %>% sd(na.rm=T) %>% round(2))
+mean_2W.base_ms <- printnum(model.base_ms$data$memory_score[model.base_ms$data$group=="Delay2W"] %>% mean(na.rm=T) %>% round(2))
+sd_2W.base_ms <- printnum(model.base_ms$data$memory_score[model.base_ms$data$group=="Delay2W"] %>% sd(na.rm=T) %>% round(2))
+
+apa_lmm.base_ms_ego <- apa_print(model.base_ms_ego)
+mean_1H.base_ms_ego <- printnum(model.base_ms_ego$data$memory_score[model.base_ms_ego$data$group=="Delay1H"] %>% mean(na.rm=T) %>% round(2))
+sd_1H.base_ms_ego <- printnum(model.base_ms_ego$data$memory_score[model.base_ms_ego$data$group=="Delay1H"] %>% sd(na.rm=T) %>% round(2))
+mean_1D.base_ms_ego <- printnum(model.base_ms_ego$data$memory_score[model.base_ms_ego$data$group=="Delay1D"] %>% mean(na.rm=T) %>% round(2))
+sd_1D.base_ms_ego <- printnum(model.base_ms_ego$data$memory_score[model.base_ms_ego$data$group=="Delay1D"] %>% sd(na.rm=T) %>% round(2))
+mean_2W.base_ms_ego <- printnum(model.base_ms_ego$data$memory_score[model.base_ms_ego$data$group=="Delay2W"] %>% mean(na.rm=T) %>% round(2))
+sd_2W.base_ms_ego <- printnum(model.base_ms_ego$data$memory_score[model.base_ms_ego$data$group=="Delay2W"] %>% sd(na.rm=T) %>% round(2))
+
+apa_lmm.base_ms_allo <- apa_print(model.base_ms_allo)
+mean_1H.base_ms_allo <- printnum(model.base_ms_allo$data$memory_score[model.base_ms_allo$data$group=="Delay1H"] %>% mean(na.rm=T) %>% round(2))
+sd_1H.base_ms_allo <- printnum(model.base_ms_allo$data$memory_score[model.base_ms_allo$data$group=="Delay1H"] %>% sd(na.rm=T) %>% round(2))
+mean_1D.base_ms_allo <- printnum(model.base_ms_allo$data$memory_score[model.base_ms_allo$data$group=="Delay1D"] %>% mean(na.rm=T) %>% round(2))
+sd_1D.base_ms_allo <- printnum(model.base_ms_allo$data$memory_score[model.base_ms_allo$data$group=="Delay1D"] %>% sd(na.rm=T) %>% round(2))
+mean_2W.base_ms_allo <- printnum(model.base_ms_allo$data$memory_score[model.base_ms_allo$data$group=="Delay2W"] %>% mean(na.rm=T) %>% round(2))
+sd_2W.base_ms_allo <- printnum(model.base_ms_allo$data$memory_score[model.base_ms_allo$data$group=="Delay2W"] %>% sd(na.rm=T) %>% round(2))
+
+rm(model.base_ms, model.base_ms_ego, model.base_ms_allo)
+```
+
+First, we wanted to investigate if the delay groups had a comparable baseline performance at the end of the learning session. There was no significant effect of delay group on the memory score in final probe trials from the original start ($M1h = `r mean_1H.base_ms`$ ($SD = `r sd_1H.base_ms`$); $M1d = `r mean_1D.base_ms`$ ($SD = `r sd_1D.base_ms`$); $M2wk = `r mean_2W.base_ms`$ ($SD = `r sd_2W.base_ms`$); `r gsub(".*, ", "", apa_lmm.base_ms$statistic)`; full results in supplementary Table B.1), in response memory probe trials ($M1h = `r mean_1H.base_ms_ego`$ ($SD = `r sd_1H.base_ms_ego`$); $M1d = `r mean_1D.base_ms_ego`$ ($SD = `r sd_1D.base_ms_ego`$); $M2wk = `r mean_2W.base_ms_ego`$ ($SD = `r sd_2W.base_ms_ego`$); `r gsub(".*, ", "", apa_lmm.base_ms_ego$statistic)`), and in place memory probe trials ($M1h = `r mean_1H.base_ms_allo`$ ($SD = `r sd_1H.base_ms_allo`$); $M1d = `r mean_1D.base_ms_allo`$ ($SD = `r sd_1D.base_ms_allo`$); $M2wk = `r mean_2W.base_ms_allo`$ ($SD = `r sd_2W.base_ms_allo`$); `r gsub(".*, ", "", apa_lmm.base_ms_allo$statistic)`). The three delay groups thus had a comparable place and response memory at the end of the learning session.
+
+```{r, include=F}
+rm(apa_lmm.base_ms, apa_lmm.base_ms_ego, apa_lmm.base_ms_allo, mean_1H.base_ms, mean_1D.base_ms, mean_2W.base_ms, mean_1H.base_ms_ego, mean_1D.base_ms_ego, mean_2W.base_ms_ego, mean_1H.base_ms_allo, mean_1D.base_ms_allo, mean_2W.base_ms_allo, sd_1H.base_ms, sd_1D.base_ms, sd_2W.base_ms, sd_1H.base_ms_ego, sd_1D.base_ms_ego, sd_2W.base_ms_ego, sd_1H.base_ms_allo, sd_1D.base_ms_allo, sd_2W.base_ms_allo)
+```
+
+## Retrieval Session 
+
+### Strategy score
+
+```{r, joint_strategy_score, include=F}
+```
+
+```{r, post_joint_strategy_score, include=F}
+```
+
+```{r apa_ret_ps, include=F}
+
+# fixed effects
+apa_lmm.joint_ps <- apa_print(model.joint_ps)
+
+# group x reference 
+apa_post.joint_ps_group_reference_chance <- post.joint_ps_group_reference_chance %>% apa_print() %>% apa_bonferroni_fix()
+apa_post.joint_ps_group_reference <- post.joint_ps_group_reference %>% apa_print() %>% apa_bonferroni_fix()
+
+rm(model.joint_ps, post.joint_ps_group_reference_chance, post.joint_ps_group_reference)
+```
+
+Next, we evaluated strategy use after the delay. First, we looked at the strategy score which captures the preference for using a place strategy (landmark information) or a response strategy (sequence information) for locating targets from new starts (Figure 2A). The LMM had significant main effects for delay (`r gsub(".*, ", "", apa_lmm.joint_ps$statistic$group)`; full results in Table 2), and reference location (`r gsub(".*, ", "", apa_lmm.joint_ps$statistic$reference)`), and a significant interaction between delay and reference location (`r gsub(".*, ", "", apa_lmm.joint_ps$statistic$group_reference)`). For all delays, participants exhibited above-chance place strategy use (all p_{Bonferroni(6)} < .006) which was significantly decreased after the 2wk delay compared to the 1h delay (`r apa_post.joint_ps_group_reference$statistic$Allo_Delay1H_Delay2W`) and the 1d delay (`r apa_post.joint_ps_group_reference$statistic$Allo_Delay1D_Delay2W`). Conversely, we observed above-chance response strategy use only after the 2wk delay (p_{Bonferroni(6)} = .005) but not after the shorter delays (all p_{Bonferroni(6)} > .999). Within delay groups, participants preferentially used place over response strategies after the 1h delay (`r apa_post.joint_ps_group_reference$statistic$Delay1H_Allo_ego`) and the 1d delay (`r apa_post.joint_ps_group_reference$statistic$Delay1D_Allo_ego`) but there was no clear preference anymore after the 2wk delay (`r apa_post.joint_ps_group_reference$statistic$Delay2W_Allo_ego`). Two of the model covariates i.e., baseline memory in the final probe trials from the original start (`r gsub(".*, ", "", apa_lmm.joint_ps$statistic$base_t1_testN)`) and baseline place memory (`r gsub(".*, ", "", apa_lmm.joint_ps$statistic$base_t1_testA)`) had a significant effect on the strategy score.
+
+```{r, include=F}
+rm(apa_lmm.joint_ps, apa_post.joint_ps_group_reference_chance, apa_post.joint_ps_group_reference)
+```
+
+```{r, include=F}
+plot.joint_ps_avg <- plot.joint_ps_avg + theme(legend.position="none")
+
+ggsave("../WP1_data/Plots/retrieval_strategy_score.jpg", plot.joint_ps_avg, width=4.7, height=4, dpi=600)
+
+rm(plot.joint_ps_avg)
+```
+
+\newpage
+
+### Navigation Behavior
+
+#### Initial rotation velocity
+
+```{r, initial_rotation_velocity, include=F}
+```
+
+```{r, post_initial_rotation_velocity, include=F}
+```
+
+```{r apa_ret_irv, include=F}
+
+# fixed effects
+apa_lmm.initial_rotation_velocity <- apa_print(model.initial_rotation_velocity)
+
+# group x reference 
+apa_post.initial_rotation_velocity_group <- post.initial_rotation_velocity_group %>% apa_print() %>% apa_bonferroni_fix()
+
+rm(model.initial_rotation_velocity, post.initial_rotation_velocity_group)
+```
+
+Second, we looked at visual landmark exploration as a marker for place strategy use (Figure 2B). For the LMM with the initial rotation velocity, we found a significant main effect of delay (`r gsub(".*, ", "", apa_lmm.initial_rotation_velocity$statistic$group)`; full results in Table 3). Initial rotation velocity decreased with increasing delay and was significantly higher after the 1h delay compared to the 2wk delay (`r apa_post.initial_rotation_velocity_group$statistic$Delay1H_Delay2W`).
+
+```{r, include=F}
+rm(apa_lmm.initial_rotation_velocity, apa_post.initial_rotation_velocity_group)
+```
+
+#### Norm. trajectory distance
+
+```{r, dynamic_time_warping, include=F}
+```
+
+```{r, post_dynamic_time_warping, include=F}
+```
+
+```{r apa_ret_dtw, include=F}
+
+# fixed effects
+apa_lmm.dtw_to_testE <- apa_print(model.dtw_to_testE)
+
+# group x reference 
+apa_post.dtw_to_testE_group <- post.dtw_to_testE_group %>% apa_print() %>% apa_bonferroni_fix()
+
+rm(model.dtw_to_testE, post.dtw_to_testE_group)
+```
+
+Third, we looked at path repetition as a marker for response strategy use (Figure 2B). For the LMM with the normalized trajectory distance (i.e., the dissimilarity between the retrieval path and the response baseline path), we found a significant effect of delay (`r gsub(".*, ", "", apa_lmm.dtw_to_testE$statistic$group)`; full results in Table 3). The normalized trajectory distance decreased with increasing delay and was significantly lower after the 2wk delay compared to after the 1h delay (`r apa_post.dtw_to_testE_group$statistic$Delay1H_Delay2W`) and the 1d delay (`r apa_post.dtw_to_testE_group$statistic$Delay1D_Delay2W`).
+
+```{r, include=F}
+rm(apa_lmm.dtw_to_testE, apa_post.dtw_to_testE_group)
+```
+
+#### Time
+
+```{r, time, include=F}
+```
+
+```{r apa_ret_time, include=F}
+
+# fixed effects
+apa_lmm.time <- apa_print(model.time)
+
+rm(model.time)
+```
+
+Lastly, we analyzed navigation efficiency. There were no differences in latency (`r gsub(".*, ", "", apa_lmm.time$statistic$group)`)
+
+```{r, include=F}
+rm(apa_lmm.time)
+```
+
+#### Excess path length
+
+```{r, excess_path_length, include=F}
+```
+
+```{r apa_ret_path, include=F}
+
+# fixed effects
+apa_lmm.path <- apa_print(model.path)
+
+rm(model.path)
+```
+
+and excess path length (`r gsub(".*, ", "", apa_lmm.path$statistic$group)`) between the three delays.
+
+Taken together, we observed that participants preferentially used place strategies after a short delay of one hour and one day but not after a longer delay of two weeks, when participants increasingly relied on response strategies. While the delay affected strategy use, it did not influence navigation efficiency.
+
+```{r, include=F}
+rm(apa_lmm.path)
+```
+
+```{r, include=F}
+
+plot.dtw_to_testE <- plot.dtw_to_testE + theme(legend.position="none")
+
+ggsave("../WP1_data/Plots/retrieval_dtw.jpg", plot.dtw_to_testE, width=2.5, height=3, dpi=600)
+
+
+plot.initial_rotation_velocity <- plot.initial_rotation_velocity + theme(legend.position="none")
+
+ggsave("../WP1_data/Plots/retrieval_rotation.jpg", plot.initial_rotation_velocity, width=2.5, height=3, dpi=600)
+
+
+rm(plot.dtw_to_testE, plot.initial_rotation_velocity, plot.time, plot.path)
+```
+
+\newpage
+ 
+## Pre-Post Change in Egocentric/Response and Allocentric/Place Memory 
+
+### Memory score
+
+```{r, change_memory_score_ego, include=F}
+```
+
+```{r, change_memory_score_allo, include=F}
+```
+
+```{r, post_change_memory_score_allo, include=F}
+```
+
+```{r apa_change_memory_score, include=F}
+
+apa_lmm.change_ms_ego <- apa_print(model.change_ms_ego)
+
+apa_lmm.change_ms_allo <- apa_print(model.change_ms_allo)
+
+apa_post.change_ms_allo <- post.change_ms_allo_group_session %>%  apa_print() %>% apa_bonferroni_fix()
+
+rm(model.change_ms_ego, model.change_ms_allo, post.change_ms_allo_group_session)
+```
+
+Next, we investigated memory recall after the delay. Here, we computed two LMMs with the memory scores from place and response memory probe trials, respectively (Figure 2C). For place memory, we found a significant interaction between delay and session (`r gsub(".*, ", "", apa_lmm.change_ms_allo$statistic$group_session)`; full results in Table 4). After the 2wk delay, participants had significantly lower place memory compared to the 1h delay (`r apa_post.change_ms_allo$statistic$X3_Delay1H_Delay2W`) and the 1d delay (`r apa_post.change_ms_allo$statistic$X3_Delay1D_Delay2W`). Place memory declined significantly between learning and retrieval sessions in the 2wk delay group only (`r apa_post.change_ms_allo$statistic$Delay2W_Session1_session`). 
+
+For response memory, we found a significant decline between the learning and retrieval session (`r gsub(".*, ", "", apa_lmm.change_ms_ego$statistic$session)`) that was, however, independent of the memory delay.
+
+Taken together, we observed that place memory was well preserved after delays of one hour and one day but deteriorated after two weeks. In contrast, response memory deteriorated immediately after learning and was then equally preserved across delays.
+
+```{r, include=F}
+rm(apa_lmm.change_ms_ego, apa_lmm.change_ms_allo, apa_post.change_ms_allo)
+```
+
+```{r, include=F}
+plot.change_ms_ego <- plot.change_ms_ego + theme(legend.position="none")
+
+ggsave("../WP1_data/Plots/change_ego_score.jpg", plot.change_ms_ego, width=3, height=3.8, dpi=600)
+
+plot.change_ms_allo <- plot.change_ms_allo + theme(legend.position="none")
+
+ggsave("../WP1_data/Plots/change_allo_score.jpg", plot.change_ms_allo, width=3, height=3.8, dpi=600)
+
+rm(plot.change_ms_ego, plot.change_ms_allo)
+```
+
+\newpage
+
+## Correlations 
+
+```{r, correlations, include=F}
+```
+
+To investigate the relationships between variables, we computed several correlations (Table 5). First, we assessed the correlations between strategy variables. More visual landmark exploration (i.e., higher initial rotation velocity) correlated with a higher place strategy score. More path repetition (i.e., lower normalized trajectory distance) correlated with a higher response strategy score. This confirms that the chosen strategy variables reliably capture place and response strategy use. We found strong inverse correlations between place strategy and response strategy variables, implying that participants used either place or response strategies but did not use other strategies (e.g., random walk). 
+Next, to investigate the relationship between strategy use and memory ability, we computed correlations between the strategy variables and memory variables (across delay groups). Participants with higher place memory at baseline and higher place and response memory after the delay were more likely to use place strategies after the delay. Participants with lower place memory at baseline and after the delay were more likely to use response strategies after the delay. There was no association between response memory and response strategy use. Additionally, we found a positive correlation between place memory and response memory after the delay, indicating a partially overlapping factor for the ability to recall consolidated spatial memory. 
+We also computed correlations between strategy use and memory ability with efficiency variables and demographical factors. Participants with a faster latency after the delay were more likely to use response strategies, less likely to use place strategies, and they had lower place memory after the delay. There were no significant associations with excess path length. Likewise, there were no significant correlations between sex, age, years of education, self-rated spatial abilities, and any of the strategy or memory variables. 
+Taken together, we found that strategy use after the delay was associated with baseline and delayed memory, in particular place memory, and correlated with the speed of navigation. Place memory and response memory were positively correlated, suggesting partially overlapping cognitive functions.  
+
+\newpage
+ 
+## Supplement: Cognitive Map Drawing 
+
+### Boundary (Prokrustes distance)
+
+```{r, boundary, include=F}
+```
+
+```{r apa_boundary, include=F}
+
+apa_lmm.boundary <- apa_print(model.boundary)
+
+rm(model.boundary)
+```
+
+We also evaluated participant's sketch maps that they drew at the end of the retrieval session. 
+
+There were no significant differences between delay groups in the maze boundary accuracy (Prokrustes distance between sketch and template boundary; `r apa_lmm.boundary$statistic$group`), 
+
+### Number of landmarks
+
+```{r, number_landmarks, include=F}
+```
+
+```{r apa_landmarks, include=F}
+
+apa_lmm.landmarks <- apa_print(model.landmarks)
+
+rm(model.landmarks)
+```
+
+in landmark identity accuracy (reflecting the number of recalled landmark; `r apa_lmm.landmarks$statistic$group`), 
+
+### Positioning of landmarks 
+
+```{r, position_landmarks, include=F}
+```
+
+```{r apa_position, include=F}
+
+apa_lmm.positioning <- apa_print(model.positioning)
+
+rm(model.positioning)
+```
+
+and in landmark canonical accuracy (reflecting the positioning accuracy of recalled landmarks; `r apa_lmm.positioning$statistic$group`). 

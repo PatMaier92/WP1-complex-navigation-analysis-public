@@ -1,0 +1,357 @@
+---
+title: "Table Creator"
+author: "Patrizia Maier"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  bookdown::word_document2:
+    fig_caption: yes
+    global_numbering: TRUE
+    number_sections: TRUE
+---
+
+```{r setup, include=F, cache=F}
+knitr::read_chunk('Script_02_Analyzer.R')
+knitr::opts_chunk$set(warning=F, message=F) 
+options(knitr.kable.NA='')
+```
+
+```{r, load_analysis_packages, include=F, cache=F}
+```
+
+```{r, include=F}
+
+in_file <- "../WP1_data/WP1_results/wp1_navigation_data.RData"
+load(in_file)
+rm(in_file)
+
+original_data <- data
+data <- data %>% 
+  filter(exclude_trial_matlab==0, exclude_low_performer==F) %>% 
+  mutate(version=factor(if_else(id %% 2 == 0, "A", "B")))
+
+in_file <- "../WP1_data/WP1_results/WP1_questionnaire_data.RData"
+load(in_file)
+rm(in_file)
+
+```
+
+```{r, data_prep, include=F}
+```
+
+```{r, plot_settings, include=F}
+```
+
+```{r, analysis_settings, include=F}
+```
+
+```{r, papaja_output_helper, include=F}
+```
+
+# Demographics 
+
+```{r, demo_table, include=F}
+```
+
+```{r, echo=F, message=F, warning=F }
+demo_table
+
+rm(demo_table, demo_data_temp)
+```
+
+\newpage
+ 
+# Learning Session
+
+```{r, base_memory_score, include=F}
+```
+
+```{r, base_memory_score_ego, include=F}
+```
+
+```{r, base_memory_score_allo, include=F}
+```
+
+```{r apa_base_memory_score, include=F}
+
+# base fixed and random
+apa_lmm.base_ms  <- apa_print(model.base_ms)
+apa_omega.base_ms <- omega.base_ms$Omega2_partial %>% apa_num()
+apa_base_ms_fixed <- apa_lmm.base_ms$table %>% 
+  list_modify("omega"=apa_omega.base_ms) %>% label_variable(omega="$\\omega^2$")
+apa_base_ms_random <- apa_random_table(VarCorr(model.base_ms$full_model)) %>% list_modify("r"=NULL)
+
+# allo / place fixed and random 
+apa_lmm.base_ms_allo <- apa_print(model.base_ms_allo)
+apa_omega.base_ms_allo <- omega.base_ms_allo$Omega2_partial %>% apa_num()
+apa_base_ms_allo_fixed <- apa_lmm.base_ms_allo$table %>% 
+  list_modify("omega"=apa_omega.base_ms_allo) %>% label_variable(omega="$\\omega^2$")
+apa_base_ms_allo_random <- apa_random_table(VarCorr(model.base_ms_allo$full_model)) %>% list_modify("r"=NULL)
+
+# ego / response fixed and random
+apa_lmm.base_ms_ego <- apa_print(model.base_ms_ego)
+apa_omega.base_ms_ego <- omega.base_ms_ego$Omega2_partial %>% apa_num()
+apa_base_ms_ego_fixed <- apa_lmm.base_ms_ego$table %>% 
+  list_modify("omega"=apa_omega.base_ms_ego) %>% label_variable(omega="$\\omega^2$")
+apa_base_ms_ego_random <- apa_random_table(VarCorr(model.base_ms_ego$full_model)) %>% list_modify("r"=NULL)
+
+rm(model.base_ms, model.base_ms_ego, model.base_ms_allo, apa_lmm.base_ms, apa_lmm.base_ms_ego, apa_lmm.base_ms_allo, apa_omega.base_ms, apa_omega.base_ms_ego, apa_omega.base_ms_allo, omega.base_ms, omega.base_ms_ego, omega.base_ms_allo)
+```
+
+```{r apa_table_base_memory_score_fixed, echo=F}
+apa_table(
+  cbind(apa_base_ms_fixed,
+        apa_base_ms_allo_fixed %>% list_modify("term"=NULL), 
+        apa_base_ms_ego_fixed %>% list_modify("term"=NULL))
+  )
+
+rm(apa_base_ms_fixed, apa_base_ms_allo_fixed, apa_base_ms_ego_fixed)
+```
+
+```{r, apa_table_base_memory_score_random, echo=F }
+apa_table(
+  cbind(apa_base_ms_random,
+        apa_base_ms_allo_random %>% list_modify("Grouping"=NULL, "Random effect"=NULL), 
+        apa_base_ms_ego_random %>% list_modify("Grouping"=NULL, "Random effect"=NULL))
+)
+
+rm(apa_base_ms_random, apa_base_ms_allo_random, apa_base_ms_ego_random)
+```
+
+\newpage
+
+# Retrieval Session 
+
+## Strategy Score 
+
+```{r, joint_strategy_score, include=F}
+```
+
+```{r, post_joint_strategy_score, include=F}
+```
+
+```{r apa_ret_ps, include=F}
+
+# fixed effects 
+apa_lmm.joint_ps <- apa_print(model.joint_ps)
+apa_omega.joint_ps <- omega.joint_ps$Omega2_partial %>% apa_num()
+apa_joint_ps_fixed <- apa_lmm.joint_ps$table %>% 
+  list_modify("omega"=apa_omega.joint_ps) %>% label_variable(omega="$\\omega^2$")
+
+# random effects 
+apa_joint_ps_random <- apa_random_table(VarCorr(model.joint_ps$full_model))
+
+# group x reference 
+apa_post.joint_ps_group_reference <- post.joint_ps_group_reference %>% apa_print() %>% apa_bonferroni_fix()
+
+rm(model.joint_ps, apa_lmm.joint_ps, apa_omega.joint_ps, omega.joint_ps, post.joint_ps_group_reference)
+```
+
+```{r apa_table_ret_strategy_score_fixed, echo=F}
+apa_table(apa_joint_ps_fixed)
+
+rm(apa_joint_ps_fixed)
+```
+
+```{r, apa_table_ret_strategy_score_random, echo=F }
+apa_table(apa_joint_ps_random)
+
+rm(apa_joint_ps_random)
+```
+
+```{r apa_table_ret_strategy_score_post, echo=F}
+apa_table(apa_post.joint_ps_group_reference$table)
+
+rm(apa_post.joint_ps_group_reference)
+```
+
+\newpage
+
+## Navigation Behavior 
+
+```{r, dynamic_time_warping, include=F}
+```
+
+```{r, post_dynamic_time_warping, include=F}
+```
+
+```{r apa_ret_dtw, include=F}
+
+# fixed effects 
+apa_lmm.dtw_to_testE <- apa_print(model.dtw_to_testE)
+apa_omega.dtw_to_testE <- omega.dtw_to_testE$Omega2_partial %>% apa_num()
+apa_dtw_to_testE_fixed <- apa_lmm.dtw_to_testE$table %>% 
+  list_modify("omega"=apa_omega.dtw_to_testE) %>% label_variable(omega="$\\omega^2$")
+
+# random effects 
+apa_dtw_to_testE_random <- apa_random_table(VarCorr(model.dtw_to_testE$full_model)) %>% list_modify("r"=NULL)
+
+# group 
+apa_post.dtw_to_testE_group <- post.dtw_to_testE_group %>% apa_print() %>% apa_bonferroni_fix()
+
+rm(model.dtw_to_testE, apa_lmm.dtw_to_testE, apa_omega.dtw_to_testE, omega.dtw_to_testE, post.dtw_to_testE_group)
+```
+
+```{r, initial_rotation_velocity, include=F}
+```
+
+```{r, post_initial_rotation_velocity, include=F}
+```
+
+```{r apa_ret_irv, include=F}
+
+# fixed effects 
+apa_lmm.initial_rotation_velocity <- apa_print(model.initial_rotation_velocity)
+apa_omega.initial_rotation_velocity <- omega.initial_rotation_velocity$Omega2_partial %>% apa_num()
+apa_initial_rotation_velocity_fixed <- apa_lmm.initial_rotation_velocity$table %>% 
+  list_modify("omega"=apa_omega.initial_rotation_velocity) %>% label_variable(omega="$\\omega^2$")
+
+# random effects 
+apa_initial_rotation_velocity_random <- apa_random_table(VarCorr(model.initial_rotation_velocity$full_model)) %>% list_modify("r"=NULL)
+
+# group 
+apa_post.initial_rotation_velocity_group <- post.initial_rotation_velocity_group %>% apa_print() %>% apa_bonferroni_fix()
+
+rm(model.initial_rotation_velocity, apa_lmm.initial_rotation_velocity, apa_omega.initial_rotation_velocity, omega.initial_rotation_velocity,  post.initial_rotation_velocity_group)
+```
+
+```{r, time, include=F}
+```
+
+```{r apa_ret_time, include=F}
+
+# fixed effects 
+apa_lmm.time <- apa_print(model.time)
+apa_omega.time <- omega.time$Omega2_partial %>% apa_num()
+apa_time_fixed <- apa_lmm.time$table %>% 
+  list_modify("omega"=apa_omega.time) %>% label_variable(omega="$\\omega^2$")
+
+# random effects 
+apa_time_random <- apa_random_table(VarCorr(model.time$full_model)) %>% list_modify("r"=NULL)
+
+rm(model.time, apa_lmm.time, apa_omega.time, omega.time)
+```
+
+```{r, excess_path_length, include=F}
+```
+
+```{r apa_ret_epl, include=F}
+
+# fixed effects 
+apa_lmm.path <- apa_print(model.path)
+apa_omega.path <- omega.path$Omega2_partial %>% apa_num()
+apa_path_fixed <- apa_lmm.path$table %>% 
+  list_modify("omega"=apa_omega.path) %>% label_variable(omega="$\\omega^2$")
+
+# random effects 
+apa_path_random <- apa_random_table(VarCorr(model.path$full_model)) %>% list_modify("r"=NULL)
+
+rm(model.path, apa_lmm.path, apa_omega.path, omega.path)
+```
+
+```{r apa_table_ret_navigation_fixed, echo=F}
+apa_table(
+  cbind(apa_initial_rotation_velocity_fixed, 
+        apa_dtw_to_testE_fixed %>% list_modify("term"=NULL),
+        apa_time_fixed %>% list_modify("term"=NULL),
+        apa_path_fixed %>% list_modify("term"=NULL))
+  )
+
+rm(apa_dtw_to_testE_fixed, apa_initial_rotation_velocity_fixed, apa_time_fixed, apa_path_fixed)
+```
+
+```{r, apa_table_ret_navigation_random, echo=F }
+apa_table(
+  cbind(apa_initial_rotation_velocity_random,
+        apa_dtw_to_testE_random %>% list_modify("Grouping"=NULL, "Random effect"=NULL),
+        apa_time_random %>% list_modify("Grouping"=NULL, "Random effect"=NULL),
+        apa_path_random %>% list_modify("Grouping"=NULL, "Random effect"=NULL))
+  )
+
+rm(apa_dtw_to_testE_random, apa_initial_rotation_velocity_random, apa_time_random, apa_path_random)
+```
+
+```{r apa_table_ret_navigation_post1, echo=F}
+apa_table(apa_post.dtw_to_testE_group$table)
+
+rm(apa_post.dtw_to_testE_group)
+```
+
+```{r apa_table_ret_navigation_post2, echo=F}
+apa_table(apa_post.initial_rotation_velocity_group$table)
+
+rm(apa_post.initial_rotation_velocity_group)
+```
+
+\newpage
+
+# Pre-Post Change in Egocentric/Response and Allocentric/Place Memory 
+
+```{r, change_memory_score_ego, include=F}
+```
+
+```{r, change_memory_score_allo, include=F}
+```
+
+```{r, post_change_memory_score_allo, include=F}
+```
+
+```{r apa_change_memory_score, include=F}
+
+# allo / place fixed and random 
+apa_lmm.change_ms_allo <- apa_print(model.change_ms_allo)
+apa_omega.change_ms_allo <- omega.change_ms_allo$Omega2_partial %>% apa_num()
+apa_change_ms_allo_fixed <- apa_lmm.change_ms_allo$table %>% 
+  list_modify("omega"=apa_omega.change_ms_allo) %>% label_variable(omega="$\\omega^2$")
+apa_change_ms_allo_random <- apa_random_table(VarCorr(model.change_ms_allo$full_model))
+
+# ego / response fixed and random
+apa_lmm.change_ms_ego <- apa_print(model.change_ms_ego)
+apa_omega.change_ms_ego <- omega.change_ms_ego$Omega2_partial %>% apa_num()
+apa_change_ms_ego_fixed <- apa_lmm.change_ms_ego$table %>% 
+  list_modify("omega"=apa_omega.change_ms_ego) %>% label_variable(omega="$\\omega^2$")
+apa_change_ms_ego_random <- apa_random_table(VarCorr(model.change_ms_ego$full_model)) 
+
+# group x session 
+apa_post.change_ms_allo_group_session <- post.change_ms_allo_group_session %>% apa_print() %>% apa_bonferroni_fix()
+
+rm(model.change_ms_allo, apa_lmm.change_ms_allo, apa_omega.change_ms_allo, omega.change_ms_allo, post.change_ms_allo_group_session, model.change_ms_ego, apa_lmm.change_ms_ego, apa_omega.change_ms_aego, omega.change_ms_ego)
+```
+
+```{r apa_table_change_memory_score_fixed, echo=F}
+apa_table(
+  cbind(apa_change_ms_allo_fixed, 
+        apa_change_ms_ego_fixed %>% list_modify("term"=NULL))
+  )
+
+rm(apa_change_ms_allo_fixed, apa_change_ms_ego_fixed)
+```
+
+```{r, apa_table_change_memory_score_random, echo=F }
+apa_table(
+  cbind(apa_change_ms_allo_random,
+        apa_change_ms_ego_random %>% list_modify("Grouping"=NULL, "Random effect"=NULL))
+)
+
+rm(apa_change_ms_allo_random, apa_change_ms_ego_random)
+```
+
+```{r apa_table_change_memory_score_post, echo=F}
+apa_table(apa_post.change_ms_allo_group_session$table)
+
+rm(apa_post.change_ms_allo_group_session)
+```
+
+\newpage
+
+# Correlations
+
+```{r, correlations, include=F}
+```
+
+```{r apa_table_correlation, echo=F}
+apa_table(table.correlation_adj,
+          note="* p < 0.05; ** p < 0.01; *** p < 0.001",
+          escape=F)
+
+rm(demo_data_temp, corr_data, table.correlation, table.correlation_adj)
+```
